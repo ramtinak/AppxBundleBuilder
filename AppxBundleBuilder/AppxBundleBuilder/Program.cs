@@ -27,6 +27,41 @@ namespace AppxBundleBuilder
 
         }
 
+        static bool ChangeMinimumSdkVersion(string path, string newVersion)
+        {
+            const string EXTENSION = "*.csproj";
+            const string START = "<TargetPlatformMinVersion>";
+            const string END = "</TargetPlatformMinVersion>";
+            // <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
+
+            try
+            {
+                var files = FindFiles(path, EXTENSION, false);
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        if (File.Exists(file))
+                        {
+                            var text = File.ReadAllText(file);
+                            if (text.IndexOf(START, StringComparison.OrdinalIgnoreCase) != -1)
+                            {
+                                var findText = FindAndReplaceValue(text, START, END, true, false);
+                                File.WriteAllText(file, text.Replace(findText, newVersion));
+                            }
+                        }
+                    }
+                    catch (Exception) 
+                    {
+                        // ignore
+                    }
+                }
+            }
+            catch (Exception ex) { PrintException(ex, "ChangeMinimumSdkVersion"); }
+
+            return false;
+        }
+
         static bool ChangeAppVersion(string path, string newVersion)
         {
             const string FILE = "Package.appxmanifest";
@@ -34,6 +69,7 @@ namespace AppxBundleBuilder
             //      Name="BLUH BLUH BLUH"
             //      Publisher="CN=BLUH-BLUH-BLUH-BLUH-BLUH"
             //      Version="1.0.18.0" />
+
             try
             {
                 var file = FindFile(path, FILE);
@@ -47,7 +83,8 @@ namespace AppxBundleBuilder
                     return true;
                 }
             }
-            catch(Exception ex) { }
+            catch (Exception ex) { PrintException(ex, "ChangeAppVersion"); }
+
             return false;
         }
 
