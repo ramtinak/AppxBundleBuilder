@@ -28,6 +28,17 @@ namespace AppxBundleBuilder
         }
 
 
+        static string FindAndReplaceValue(string source,
+            string start,
+            string end,
+            bool appendLengthToStart = false,
+            bool appendLengthToEnd = true)
+        {
+            string s = source.Substring(source.IndexOf(start) + (appendLengthToStart ? start.Length : 0));
+            s = s.Substring(0, s.IndexOf(end) + (appendLengthToEnd ? end.Length : 0));
+            return s;
+        }
+
         static string FindFile(string folder, string exactName)
         {
             string[] files = FindFiles(folder, exactName);
