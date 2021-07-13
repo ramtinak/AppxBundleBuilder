@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>Ramtin Jokar</Authors>
+    <Company>Ramtin Jokar [ ramtinak@live.com</Company>
+    <Description>A tiny automation tool to create Appx file for different architecture in UWP.</Description>
+    <Copyright>(c) 2021 Ramtin Jokar [ Ramtinak@live.com ]</Copyright>
+    <PackageProjectUrl>https://github.com/ramtinak/AppxBundleBuilder</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ramtinak/AppxBundleBuilder</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
