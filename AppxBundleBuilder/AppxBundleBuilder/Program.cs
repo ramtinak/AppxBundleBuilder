@@ -22,9 +22,24 @@ namespace AppxBundleBuilder
     {
         static readonly Stopwatch StopwatchAll = new();
 
-        static void Main()
+        static async Task Main()
         {
+            var jsonText = await File.ReadAllTextAsync("Configuration.json").ConfigureAwait(false);
+            
+            var configuration = JsonConvert.DeserializeObject<ConfigurationSettings>(jsonText);
+            StopwatchAll.Start();
+            if (configuration.Platforms?.Count > 0)
+            {
+                foreach (var platform in configuration.Platforms)
+                {
+                    await BuildConfiguration(configuration, platform);
+                }
+            }
+            StopwatchAll.Stop();
+            var elp = StopwatchAll.Elapsed;
+            WriteLine($"-- {configuration.Platforms?.Count} platform(s) generated in {elp.Hours}:{elp.Minutes}:{elp.Seconds}.{elp.Milliseconds}");
 
+            Read();
         }
 
         static async Task BuildConfiguration(ConfigurationSettings configuration, Platform platform)
@@ -258,7 +273,7 @@ namespace AppxBundleBuilder
             bool appendLengthToStart = false,
             bool appendLengthToEnd = true)
         {
-            string s = source.Substring(source.IndexOf(start) + (appendLengthToStart ? start.Length : 0));
+            string s = source[(source.IndexOf(start) + (appendLengthToStart ? start.Length : 0))..];
             s = s.Substring(0, s.IndexOf(end) + (appendLengthToEnd ? end.Length : 0));
             return s;
         }
