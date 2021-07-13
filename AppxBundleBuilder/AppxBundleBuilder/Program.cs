@@ -26,6 +26,27 @@ namespace AppxBundleBuilder
         {
 
         }
+
+        static bool RunCommand(string cmd)
+        {
+            using Process process = new();
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.FileName = @"C:\Windows\System32\cmd.exe";
+            process.StartInfo.Arguments = "/C " + cmd;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.Start();
+            StreamReader sr = process.StandardOutput;
+            while (!sr.EndOfStream)
+            {
+                var v = sr.ReadLine();
+                WriteLine(v);
+            }
+            Thread.Sleep(5000);
+            return true;
+        }
+
         static bool ChangeDependencyVersion(string path, string dependencyName, string dependencyVersion)
         {
             const string EXTNESION = "*.csproj";
