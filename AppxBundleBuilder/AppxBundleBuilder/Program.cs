@@ -27,6 +27,14 @@ namespace AppxBundleBuilder
 
         }
 
+
+        static string FindFile(string folder, string exactName)
+        {
+            string[] files = FindFiles(folder, exactName);
+
+            return files?.Length > 0 ? files[0] : null;
+        }
+
         static string[] FindFiles(string folder, string exactName, bool checkIf = true)
         {
             return Directory.GetFiles(folder, exactName, SearchOption.AllDirectories)
