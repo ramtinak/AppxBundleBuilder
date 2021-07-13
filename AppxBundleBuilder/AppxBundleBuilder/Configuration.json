@@ -1,0 +1,31 @@
+﻿{
+  "SolutionDir": "SLN_PATH",
+  "ProjectDir": "CSRPOJ_PATH",
+  "RestoreNugetPackages": true, // always should be TRUE
+  "GenerateAppxUpload": true,
+  "DeleteBinObjFolders": true,
+  "Platforms": [
+    {
+      "AppxBundlePlatforms": "ARM", // x86|x64|ARM
+      "MinimumSdkVersion": "10.0.15063.0",
+      "AppVersion": "1.0.20.0",
+      "Dependencies": [
+        {
+          "Name": "Microsoft.Toolkit.Uwp.UI.Controls",
+          "Version": "4.0.0"
+        }
+      ]
+    },
+    {
+      "AppxBundlePlatforms": "x64", // x86|x64|ARM
+      "MinimumSdkVersion": "10.0.16299.0",
+      "AppVersion": "1.0.21.0",
+      "Dependencies": [
+        {
+          "Name": "Microsoft.Toolkit.Uwp.UI.Controls",
+          "Version": "6.0.0"
+        }
+      ]
+    }
+  ]
+}
