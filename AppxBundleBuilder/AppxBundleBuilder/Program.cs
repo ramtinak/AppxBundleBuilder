@@ -27,6 +27,29 @@ namespace AppxBundleBuilder
 
         }
 
+        static bool DeleteObjBinFolders(string path)
+        {
+            var bins = FindFolders(path, "bin");
+            var objs = FindFolders(path, "obj");
+            foreach (var folder in bins)
+            {
+                DeleteIfExists(folder);
+            }
+
+            foreach (var folder in objs)
+            {
+                DeleteIfExists(folder);
+            }
+
+            static void DeleteIfExists(string folderPath)
+            {
+                if (Directory.Exists(folderPath))
+                {
+                    Directory.Delete(folderPath, true);
+                }
+            }
+            return false;
+        }
 
         static string FindAndReplaceValue(string source,
             string start,
