@@ -105,5 +105,13 @@ namespace AppxBundleBuilder
             return Directory.GetDirectories(folder, search, SearchOption.AllDirectories)
                 .ToArray();
         }
+
+        static void PrintException(Exception ex, string title = "")
+        {
+            Debug.WriteLine($"Exception thrown for {title} at {DateTime.Now}");
+            Debug.WriteLine($"Message: {ex.Message}");
+            Debug.WriteLine($"Source: {ex.Source}");
+            Debug.WriteLine($"Stacktrace: {ex.StackTrace}");
+        }
     }
 }
