@@ -27,6 +27,88 @@ namespace AppxBundleBuilder
 
         }
 
+        static async Task BuildConfiguration(ConfigurationSettings configuration, Platform platform)
+        {
+            try
+            {
+                var stopwatch = Stopwatch.StartNew();
+                WriteLine($"Generating package file for {platform.AppxBundlePlatforms}, " +
+                    $"App version: {platform.AppVersion}, Minimum sdk version: {platform.MinimumSdkVersion}.");
+
+                WriteLine(" - Started");
+
+                var solutionPath = Path.GetDirectoryName(configuration.SolutionDir);
+                WriteLine($" - Updating app version to {platform.AppVersion}.");
+                ChangeAppVersion(solutionPath, platform.AppVersion);
+                WriteLine($" - App version updated to {platform.AppVersion} successfully.");
+
+                WriteLine($" - Updating minimum sdk version to {platform.MinimumSdkVersion}.");
+                ChangeMinimumSdkVersion(solutionPath, platform.MinimumSdkVersion);
+                WriteLine($" - Minimum sdk version updated to {platform.MinimumSdkVersion} successfully.");
+
+                var builder = new StringBuilder();
+                builder.Append("MSBuild ");
+                builder.Append($"\"{configuration.SolutionDir}\" ");
+                builder.Append("/p:Configuration=Release ");
+                builder.Append($"/p:Platform=\"{platform.AppxBundlePlatforms}\";");
+                builder.Append($"AppxBundle=Always;");
+                builder.Append($"AppxBundlePlatforms=\"{platform.AppxBundlePlatforms}\" ");
+                if (configuration.GenerateAppxUpload)
+                    builder.Append($"/p:BuildAppxUploadPackageForUap=true");
+
+                if (platform.Dependencies?.Count > 0)
+                {
+                    WriteLine($" - Updating dependencies version.");
+
+                    try
+                    {
+                        foreach (var dependency in platform.Dependencies)
+                        {
+                            ChangeDependencyVersion(solutionPath, dependency.Name, dependency.Version);
+
+                            WriteLine($" - Dependency update -> {dependency.Name} to {dependency.Version}.");
+                        }
+
+                        WriteLine($" - All dependencies updated successfully.");
+                    }
+                    catch (Exception exception)
+                    {
+                        WriteLine($" - Updating dependencies failed with this error:");
+                        PrintException(exception);
+                        Failed();
+                        return;
+                    }
+                }
+
+                if (configuration.RestoreNugetPackages)
+                {
+                    if (configuration.DeleteBinObjFolders)
+                    {
+                        WriteLine("Deleting 'obj' and 'bin' folders.");
+                        DeleteObjBinFolders(solutionPath);
+                        WriteLine("'obj' and 'bin' folders deleted successfully.");
+                    }
+
+                    WriteLine("Restoring nuget packages.");
+                    RunCommand($"nuget restore \"{configuration.SolutionDir}\"");
+                }
+                await Task.Delay(4000);
+                WriteLine(" - Generating app package (appx) file and other stuffs");
+                RunCommand(builder.ToString());
+                WriteLine($" - App package (appx) package for {platform.AppxBundlePlatforms} successfully generated.");
+                stopwatch.Stop();
+                var elp = stopwatch.Elapsed;
+                WriteLine($"-- {platform.AppxBundlePlatforms} package generated in {elp.Hours}:{elp.Minutes}:{elp.Seconds}.{elp.Milliseconds}");
+            }
+            catch (Exception exception)
+            {
+                WriteLine(exception);
+                Failed();
+            }
+
+            void Failed() => WriteLine($"Generating package file for {platform.AppxBundlePlatforms} failed.");
+        }
+
         static bool RunCommand(string cmd)
         {
             using Process process = new();
