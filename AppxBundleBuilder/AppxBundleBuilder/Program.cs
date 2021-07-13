@@ -26,6 +26,43 @@ namespace AppxBundleBuilder
         {
 
         }
+        static bool ChangeDependencyVersion(string path, string dependencyName, string dependencyVersion)
+        {
+            const string EXTNESION = "*.csproj";
+            //<PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
+            //  <Version>4.0.0</Version>
+            //</PackageReference>
+
+            try
+            {
+                var files = FindFiles(path, EXTNESION, false);
+                var dName = $"<PackageReference Include=\"{dependencyName}\"";
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        if (File.Exists(file))
+                        {
+                            var text = File.ReadAllText(file);
+                            if (text.IndexOf(dName, StringComparison.OrdinalIgnoreCase) != -1)
+                            {
+                                var findText = FindAndReplaceValue(text, dName, "</PackageReference>");
+                                var findVersion = FindAndReplaceValue(findText, "<Version>", "</Version>", true, false);
+                                var replacedText = findText.Replace(findVersion, dependencyVersion);
+                                File.WriteAllText(file, text.Replace(findText, replacedText));
+                            }
+                        }
+                    }
+                    catch (Exception) 
+                    { 
+                        // ignore
+                    }
+                }
+            }
+            catch (Exception ex) { PrintException(ex, "ChangeDependencyVersion"); }
+
+            return false;
+        }
 
         static bool ChangeMinimumSdkVersion(string path, string newVersion)
         {
