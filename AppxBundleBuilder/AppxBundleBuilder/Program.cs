@@ -27,6 +27,30 @@ namespace AppxBundleBuilder
 
         }
 
+        static bool ChangeAppVersion(string path, string newVersion)
+        {
+            const string FILE = "Package.appxmanifest";
+            //  <Identity
+            //      Name="BLUH BLUH BLUH"
+            //      Publisher="CN=BLUH-BLUH-BLUH-BLUH-BLUH"
+            //      Version="1.0.18.0" />
+            try
+            {
+                var file = FindFile(path, FILE);
+                if (!string.IsNullOrEmpty(file) && File.Exists(file))
+                {
+                    var text = File.ReadAllText(file);
+                    var findText = FindAndReplaceValue(text, "<Identity", "/>");
+                    var findVersion = FindAndReplaceValue(findText, "Version=\"", "\"", true, false);
+                    var replacedText = findText.Replace(findVersion, newVersion);
+                    File.WriteAllText(file, text.Replace(findText, replacedText));
+                    return true;
+                }
+            }
+            catch(Exception ex) { }
+            return false;
+        }
+
         static bool DeleteObjBinFolders(string path)
         {
             var bins = FindFolders(path, "bin");
